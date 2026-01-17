@@ -1,59 +1,78 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Overseas Candidate Progress Management System (OCPMS)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+OCPMS is a Laravel 10 web application that centralises the onboarding process for overseas job candidates. It replaces spreadsheet-based tracking with role-aware dashboards, structured candidate records, and secure document storage.
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Backend**: PHP 8.2, Laravel 10, Laravel Breeze authentication
+- **Frontend**: Blade templates, Tailwind CSS, Alpine.js, Chart.js
+- **Database**: MySQL 8+ (SQLite in tests), Eloquent ORM
+- **Storage**: Laravel public disk for document uploads
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Getting Started
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. **Install dependencies**
+   ```bash
+   composer install
+   npm install
+   npm run dev   # or npm run build for production
+   ```
+2. **Environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   Update database credentials (`DB_*`) for MySQL. Document uploads use the `public` filesystem disk by default; if you change it, update `FILESYSTEM_DISK`.
+3. **Database**
+   ```bash
+   php artisan migrate --seed
+   ```
+4. **Storage symlink**
+   ```bash
+   php artisan storage:link
+   ```
+5. **Run tests / dev server**
+   ```bash
+   php artisan test
+   php artisan serve
+   ```
 
-## Learning Laravel
+### Default Accounts
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+| Role   | Email                | Password |
+|--------|----------------------|----------|
+| Admin  | `admin@ocpms.test`   | `password` |
+| Staff  | `staff@ocpms.test`   | `password` |
+| Candidate | `candidate@ocpms.test` | `password` |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Candidate users are redirected to their own progress page, while Admin & Staff can access dashboards and management tools.
 
-## Laravel Sponsors
+## Core Modules
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Authentication & Authorization**: Breeze scaffolding with role gates (admin, staff, candidate). Access to candidate data is restricted per role.
+- **Candidate Management**: CRUD UI with search, position/visa/medical filters, pagination, and aggregated progress data.
+- **Progress Tracking**: Down-payment, medical, visa, ticket, departure date, and remarks fields stored in `candidate_progress`.
+- **Document Center**: Upload/download/delete passport, medical, visa, and ticket files stored on the public disk.
+- **Dashboard & Reporting**: Real-time widgets (totals, medical backlog, document count), visa distribution chart (Chart.js), upcoming departures, and latest candidates.
 
-### Premium Partners
+## Routing Overview
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+| Method | Endpoint                                 | Description                         |
+|--------|------------------------------------------|-------------------------------------|
+| GET    | `/login`                                 | Breeze login                        |
+| GET    | `/dashboard`                             | Role-aware dashboard                |
+| GET    | `/candidates`                            | Candidate list & filters            |
+| POST   | `/candidates`                            | Create candidate + progress         |
+| GET    | `/candidates/{candidate}`                | Candidate details + document center |
+| PUT    | `/candidates/{candidate}`                | Update candidate + progress         |
+| DELETE | `/candidates/{candidate}`                | Delete candidate                    |
+| POST   | `/candidates/{candidate}/documents`      | Upload document                     |
+| DELETE | `/candidates/{candidate}/documents/{id}` | Remove document                     |
 
-## Contributing
+## Further Enhancements
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Notifications (email/WhatsApp) for visa/passport reminders
+- Activity/audit logs
+- Public REST API for mobile integrations
 
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Pull requests and feature ideas are welcome!
